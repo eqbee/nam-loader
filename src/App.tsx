@@ -19,11 +19,15 @@ function App() {
     return audioEngine.current
   }
 
+  function finishPlayback() {
+    setIsPlaying(false)
+  }
+
   function getAudioPlayback(): AudioPlayback | null {
     const currentAudioPlayback = audioPlayback?.current
     const currentAudioEngine = getAudioEngine()
     if (!currentAudioPlayback && currentAudioEngine) {
-      const playback = new AudioPlayback(currentAudioEngine, demoUrl)
+      const playback = new AudioPlayback(currentAudioEngine, demoUrl, finishPlayback)
       audioPlayback.current = playback
     }
     return audioPlayback.current
@@ -32,7 +36,7 @@ function App() {
   async function play() {
     const playback = getAudioPlayback()
     if (playback) {
-      playback.play()
+      await playback.play()
       setIsPlaying(true)
     }
   }

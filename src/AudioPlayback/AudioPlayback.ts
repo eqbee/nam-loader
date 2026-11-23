@@ -1,13 +1,16 @@
 import type { AudioEngine } from "@/AudioEngine/AudioEngine";
 
 export class AudioPlayback {
+  private audioBuffer: AudioBuffer | null = null
   private audioBufferSource: AudioBufferSourceNode | null = null
   private audioEngine: AudioEngine | null = null
   private sourceUrl: string | null = null
+  private onEnded: () => void | undefined
 
-  constructor(audioEngine: AudioEngine, sourceUrl: string) {
+  constructor(audioEngine: AudioEngine, sourceUrl: string, onEnded: () => void | undefined) {
     this.audioEngine = audioEngine
     this.sourceUrl = sourceUrl
+    this.onEnded = onEnded
   }
 
   private async loadSource(context: AudioContext | null, sourceUrl: string | null) {
@@ -15,27 +18,34 @@ export class AudioPlayback {
       return
     }
     const sourceResponse = await fetch(sourceUrl)
-    // TODO - keep this buffer in a class variable so we don't have to decode it more than once
-    const audioBuffer = await context.decodeAudioData(
-      await sourceResponse.arrayBuffer()
-    )
+
+    // decoding audio data is expensive, we only need to do it once
+    if (!this.audioBuffer) {
+      const buffer = await context.decodeAudioData(
+        await sourceResponse.arrayBuffer()
+      )
+      this.audioBuffer = buffer;
+    }
+
     const source = context.createBufferSource()
-    source.buffer = audioBuffer
+    source.buffer = this.audioBuffer
     source.connect(context.destination)
     this.audioBufferSource = source
 
     source.onended = () => {
+      source.disconnect()
+
       if (this.audioBufferSource === source) {
         this.audioBufferSource = null
+        this.onEnded?.()
       }
     }
-    source.start()
   }
 
   async play() {
     const context = this.audioEngine?.audioContext
     if (context) {
-      await this.loadSource(context, this.sourceUrl)  
+      await this.loadSource(context, this.sourceUrl)
       this.audioBufferSource?.start()
     }
   }
