@@ -1,33 +1,57 @@
-import { useState } from 'react'
 import './App.css'
-import type { MouseEvent } from 'react'
+import { useRef, useState } from 'react'
+import demoUrl from './assets/demo.wav'
+import { AudioEngine } from './AudioEngine/AudioEngine'
+import { Button } from "@/components/ui/button"
+import { AudioPlayback } from './AudioPlayback/AudioPlayback'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const increment = () => setCount(count + 1)
+  const audioEngine = useRef<AudioEngine | null>(null)
+  const audioPlayback = useRef<AudioPlayback | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  function getAudioEngine(): AudioEngine | null {
+    const currentEngine = audioEngine.current
+    if (!currentEngine) {
+      const engine = new AudioEngine();
+      audioEngine.current = engine
+    }
+    return audioEngine.current
+  }
+
+  function getAudioPlayback(): AudioPlayback | null {
+    const currentAudioPlayback = audioPlayback?.current
+    const currentAudioEngine = getAudioEngine()
+    if (!currentAudioPlayback && currentAudioEngine) {
+      const playback = new AudioPlayback(currentAudioEngine, demoUrl)
+      audioPlayback.current = playback
+    }
+    return audioPlayback.current
+  }
+
+  async function play() {
+    const playback = getAudioPlayback()
+    if (playback) {
+      playback.play()
+      setIsPlaying(true)
+    }
+  }
+  function stop() {
+    const playback = getAudioPlayback()
+    if (playback) {
+      playback.stop()
+      setIsPlaying(false)
+    }
+  }
 
   return (
     <>
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
           <h1 className="text-4xl font-bold">Hello World!</h1>
-          <Button label="Increment counter" onClick={increment}></Button>
-          <p>Count: {count}</p>
+          <Button onClick={isPlaying ? stop : play}>{isPlaying ? 'Stop' : 'Play'}</Button>
         </div>
       </div>
-    </>
-  )
-}
-
-type ButtonProps = {
-  label: string
-  onClick: (event: MouseEvent<HTMLButtonElement>) => void
-}
-
-function Button({ label, onClick }: ButtonProps) {
-  return (
-    <>
-      <button type="button" className="rounded-md bg-blue-600 px-4 py-2 my-2 text-white cursor-pointer" onClick={onClick}>{label}</button>
     </>
   )
 }

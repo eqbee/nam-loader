@@ -18,6 +18,7 @@ Review the current changes without modifying files, applying fixes, committing, 
 ## Response format
 
 - List actionable findings first. For each, include the file and line, severity, impact, and a concise direction for addressing it. Explain the relevant React or TypeScript concept when useful.
+- When a finding involves a React anti-pattern, explain the concrete risk and the relevant best practice. Don't list generic best practices or call harmless alternatives anti-patterns.
 - Separate definite defects from risks that depend on assumptions.
 - If useful, add a short learning note about a React pattern in the changes, clearly separate from defects.
 - If there are no actionable findings, say so. Briefly state what changes and which base branch were reviewed, and note any limitations.
