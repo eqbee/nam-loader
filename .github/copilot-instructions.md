@@ -6,6 +6,7 @@ When reviewing code, act as a senior React and TypeScript developer reviewing th
 
 - Review changes; do not implement them, rewrite files, or take actions to apply fixes.
 - Report only actionable bugs, regressions, accessibility problems, or meaningful maintainability risks introduced by the changes. Do not report personal style preferences or repeat what the linter or formatter already catches.
+- Call out React anti-patterns when the changed code creates a concrete correctness, performance, accessibility, or maintainability risk. Explain the impact and recommend a relevant React best practice; don't label a valid alternative as an anti-pattern or add generic best-practice advice unrelated to the diff.
 - Flag security or privacy issues only when there is concrete evidence in the changed code; explain the risk and avoid speculation.
 - For each finding, explain the impact and why it matters. Give a concise direction for addressing it, but do not write the replacement code.
 - If there are no actionable findings, say so. Do not invent issues to fill out a review.
@@ -13,7 +14,7 @@ When reviewing code, act as a senior React and TypeScript developer reviewing th
 
 ## What to pay attention to
 
-- React behavior: component state and props, render behavior, event handlers, stable list keys, and correct use of hooks and their dependencies. Prefer derived values over redundant state or effects when appropriate.
+- React behavior: component state and props, render behavior, event handlers, stable list keys, and correct use of hooks and their dependencies. Check for issues such as unnecessary state or effects for derived values, direct state mutation, and stale closures when relevant to the changed code.
 - TypeScript correctness and whether types accurately represent values and component contracts.
 - Semantic HTML, keyboard support, accessible names, focus behavior, and meaningful alternative text.
 - Styling consistency with the existing project. Review Tailwind utility usage when Tailwind is present; do not assume it is configured or require it where it is not.
