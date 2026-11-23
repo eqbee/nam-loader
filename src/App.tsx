@@ -9,6 +9,7 @@ function App() {
   const audioEngine = useRef<AudioEngine | null>(null)
   const audioPlayback = useRef<AudioPlayback | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   function getAudioEngine(): AudioEngine | null {
     const currentEngine = audioEngine.current
@@ -21,6 +22,7 @@ function App() {
 
   function finishPlayback() {
     setIsPlaying(false)
+    setIsLoading(false)
   }
 
   function getAudioPlayback(): AudioPlayback | null {
@@ -36,8 +38,15 @@ function App() {
   async function play() {
     const playback = getAudioPlayback()
     if (playback) {
-      await playback.play()
-      setIsPlaying(true)
+      setIsLoading(true)
+      try {
+        await playback.play()
+        setIsPlaying(true)
+      } catch (error) {
+        console.error('Error with audio playback:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
   function stop() {
@@ -53,7 +62,7 @@ function App() {
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
           <h1 className="text-4xl font-bold">Hello World!</h1>
-          <Button onClick={isPlaying ? stop : play}>{isPlaying ? 'Stop' : 'Play'}</Button>
+          <Button onClick={isPlaying ? stop : play} disabled={isLoading}>{isPlaying ? 'Stop' : 'Play'}</Button>
         </div>
       </div>
     </>

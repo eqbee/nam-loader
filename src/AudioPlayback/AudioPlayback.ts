@@ -17,10 +17,9 @@ export class AudioPlayback {
     if (!context || !sourceUrl) {
       return
     }
-    const sourceResponse = await fetch(sourceUrl)
-
     // decoding audio data is expensive, we only need to do it once
     if (!this.audioBuffer) {
+      const sourceResponse = await fetch(sourceUrl)
       const buffer = await context.decodeAudioData(
         await sourceResponse.arrayBuffer()
       )
